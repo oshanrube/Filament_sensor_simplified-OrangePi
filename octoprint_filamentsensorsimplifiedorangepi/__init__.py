@@ -211,12 +211,12 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
     # pulls resistor up or down based on the parameters
     def pull_resistor(self, pin, power):
         if power is 0:
-            self._logger.debug("Pulling up resistor")
+            self._logger.info("Pulling up resistor")
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         elif power is 1:
-            self._logger.debug("Pulling down resistor")
+            self._logger.info("Pulling down resistor")
             GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        self._logger.debug("Done")
+        self._logger.info("Done")
 
     def on_after_startup(self):
         self._logger.info("Filament Sensor Simplified started")
