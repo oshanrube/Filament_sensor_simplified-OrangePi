@@ -44,10 +44,6 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         self.changing_filament_started = False
 
     @property
-    def setting_gpio_mode(self):
-        return int(self._settings.get(["gpio_mode"]))
-
-    @property
     def setting_pin(self):
         return str(self._settings.get(["pin"]))
 
@@ -78,7 +74,6 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
     # Settings hook
     def get_settings_defaults(self):
         return dict(
-            gpio_mode=10,
             pin='PC9',  # Default is 0
             power=0,
             g_code=self.default_gcode,
@@ -101,13 +96,12 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         try:
             selected_power = int(data.get("power"))
             selected_pin = str(data.get("pin"))
-            mode = int(data.get("mode"))
             triggered_mode = int(data.get("triggered"))
 
             if selected_pin is 0:
                 return "", 556
 
-            self.init_gpio(mode, selected_pin, selected_power, triggered_mode, True)
+            self.init_gpio(selected_pin, selected_power, triggered_mode, True)
             triggered_int = self.is_filament_present(selected_pin, selected_power, triggered_mode)
             self.init_gpio(self.setting_gpio_mode, self.setting_pin, self.setting_power, self.setting_triggered, True)
             return flask.jsonify(triggered=triggered_int)
@@ -155,43 +149,30 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
             self._plugin_manager.send_plugin_message(self._identifier, dict(type="filamentStatus", noFilament=False,
                                                                             msg="Filament inserted!"))
 
-    def init_gpio(self, gpio_mode, pin, power, trigger_mode, test):
+    def init_gpio(self, pin, power, trigger_mode, test):
         self._logger.info("Initializing GPIO.")
         preset_gpio_mode = GPIO.getmode()
         if preset_gpio_mode is not None:
             self.gpio_mode_disabled = True
-            gpio_mode = preset_gpio_mode
             self._settings.set(["gpio_mode"], preset_gpio_mode)
         else:
             self._logger.info("Preset mode is %s" % preset_gpio_mode)
 
         if self.plugin_enabled(pin):
             self._logger.info("Enabling filament sensor.")
-            self._logger.info("Mode is %s" % gpio_mode)
             # SUNXI
-            if gpio_mode is 10:
-                # if mode set by 3rd party don't set it again
-                if not self.gpio_mode_disabled:
-                    self._logger.info("Setting Board mode")
-                    GPIO.cleanup()
-                    GPIO.setmode(GPIO.SUNXI)
-                # first check pins not in use already
-                usage = GPIO.gpio_function(pin)
-                self._logger.debug("usage on pin %s is %s" % (pin, usage))
-                # 1 = input
-                if usage is not 1:
-                    # 555 is not http specific so I chose it
-                    return "", 555
-            # BCM
-            elif gpio_mode is 11:
-                # BCM range 1-27
-                if pin > 27:
-                    return "", 556
-                # if mode set by 3rd party don't set it again
-                if not self.gpio_mode_disabled:
-                    self._logger.debug("Setting BCM mode")
-                    GPIO.cleanup()
-                    GPIO.setmode(GPIO.BCM)
+			# if mode set by 3rd party don't set it again
+			if not self.gpio_mode_disabled:
+				self._logger.info("Setting Board mode")
+				GPIO.cleanup()
+				GPIO.setmode(GPIO.SUNXI)
+			# first check pins not in use already
+			usage = GPIO.gpio_function(pin)
+			self._logger.debug("usage on pin %s is %s" % (pin, usage))
+			# 1 = input
+			if usage is not 1:
+				# 555 is not http specific so I chose it
+				return "", 555
             if not test:
                 try:
                     # 0 = sensor is grounded, react to rising edge pulled up by pull up resistor
@@ -246,22 +227,18 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
 
     def on_after_startup(self):
         self._logger.info("Filament Sensor Simplified started")
-        self.init_gpio(self.setting_gpio_mode, self.setting_pin, self.setting_power, self.setting_triggered, False)
+        self.init_gpio(self.setting_pin, self.setting_power, self.setting_triggered, False)
         self.gpio_initialized = True
 
     def on_settings_save(self, data):
         # Retrieve any settings not changed in order to validate that the combination of new and old settings end up in a bad combination
         self._logger.info("Saving settings for Filament Sensor Simplified")
         pin_to_save = self._settings.get_str(["pin"])
-        gpio_mode_to_save = self._settings.get_int(["gpio_mode"])
         power_to_save = self._settings.get_int(["power"])
         trigger_mode_to_save = self._settings.get_int(["triggered"])
 
         if "pin" in data:
             pin_to_save = str(data.get("pin"))
-
-        if "gpio_mode" in data:
-            gpio_mode_to_save = int(data.get("gpio_mode"))
 
         if "power" in data:
             power_to_save = int(data.get("power"))
@@ -274,26 +251,16 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
             if pin_to_save is not 0:
                 try:
                     # SUNXI
-                    if gpio_mode_to_save is 10:
-                        # before saving check if pin not used by others
-                        usage = GPIO.gpio_function(pin_to_save)
-                        self._logger.debug("usage on pin %s is %s" % (pin_to_save, usage))
-                        if usage is not 1:
-                            self._logger.info(
-                                "You are trying to save pin %s which is already used by others" % (pin_to_save))
-                            self._plugin_manager.send_plugin_message(self._identifier,
-                                                                     dict(type="error", autoClose=True,
-                                                                          msg="Filament sensor settings not saved, you are trying to use a pin which is already used by others"))
-                            return
-                    # BCM
-                    elif gpio_mode_to_save is 11:
-                        if pin_to_save > 27:
-                            self._logger.info(
-                                "You are trying to save pin %s which is out of range" % (pin_to_save))
-                            self._plugin_manager.send_plugin_message(self._identifier,
-                                                                     dict(type="error", autoClose=True,
-                                                                          msg="Filament sensor settings not saved, you are trying to use a pin which is out of range"))
-                            return
+					# before saving check if pin not used by others
+					usage = GPIO.gpio_function(pin_to_save)
+					self._logger.debug("usage on pin %s is %s" % (pin_to_save, usage))
+					if usage is not 1:
+						self._logger.info(
+							"You are trying to save pin %s which is already used by others" % (pin_to_save))
+						self._plugin_manager.send_plugin_message(self._identifier,
+																 dict(type="error", autoClose=True,
+																	  msg="Filament sensor settings not saved, you are trying to use a pin which is already used by others"))
+						return
 
                 except ValueError:
                     self._logger.info(
@@ -301,7 +268,7 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
                     self._plugin_manager.send_plugin_message(self._identifier, dict(type="error", autoClose=True,
                                                                                     msg="Filament sensor settings not saved, you are trying to use a pin which is ground/power pin or out of range"))
                     return
-                self.init_gpio(gpio_mode_to_save, pin_to_save, power_to_save, trigger_mode_to_save, False)
+                self.init_gpio(pin_to_save, power_to_save, trigger_mode_to_save, False)
                 self.init_icon(pin_to_save, power_to_save, trigger_mode_to_save)
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
