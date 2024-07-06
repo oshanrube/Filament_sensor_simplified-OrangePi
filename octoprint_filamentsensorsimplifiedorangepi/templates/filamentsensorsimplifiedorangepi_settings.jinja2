@@ -24,8 +24,8 @@
     <div class="control-group">
         <label class="control-label" for="filamentsensorsimplifiedorangepi_settings_pinInput">{{ _('Pin number') }}</label>
         <div class="controls">
-            <input id="filamentsensorsimplifiedorangepi_settings_pinInput" type="number" step="1" min="0" max="40" class="input-mini" data-bind="value: settingsViewModel.settings.plugins.filamentsensorsimplifiedorangepi.pin, disable:printing" required>
-            <span class="help-block">Which Raspberry Pi pin is your sensor output attached to? (0 disables the plugin) <a target="_blank" href="https://pinout.xyz/">Pinout help</a></span>
+            <input id="filamentsensorsimplifiedorangepi_settings_pinInput" type="text" class="input-mini" data-bind="value: settingsViewModel.settings.plugins.filamentsensorsimplifiedorangepi.pin, disable:printing" required>
+            <span class="help-block">Which Orange Pi pin is your sensor output attached to? (0 disables the plugin) <a target="_blank" href="https://pinout.xyz/">Pinout help</a></span>
             <div class="alert alert-error hidden" id="filamentsensorsimplifiedorangepi_settings_badpin">
                 <i class="fas fa-info icon-info-sign iconRight"></i>
                 {{ _('Warning: The selected pin is not a standard "data" pin.') }}
@@ -43,7 +43,7 @@
             <span class="help-block">Specify how the sensor (switch) is connected. One end of the sensor must be wired to ground or 3.3V.</span>
             <div class="alert alert-error">
                 <i class="fas fa-exclamation icon-warning-sign iconRight"></i>
-                Warning! Never connect the sensor to 5V! 5V could destroy GPIO of your Raspberry Pi.
+                Warning! Never connect the sensor to 5V! 5V could destroy GPIO of your Orange Pi.
             </div>
         </div>
     </div>
