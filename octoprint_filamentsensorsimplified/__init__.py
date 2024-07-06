@@ -9,7 +9,7 @@ import RPi.GPIO as GPIO
 import flask
 
 
-class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
+class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
                                        octoprint.plugin.EventHandlerPlugin,
                                        octoprint.plugin.TemplatePlugin,
                                        octoprint.plugin.SettingsPlugin,
@@ -69,7 +69,7 @@ class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
 
     # AssetPlugin hook
     def get_assets(self):
-        return dict(js=["js/filamentsensorsimplified.js"], css=["css/filamentsensorsimplified.css"])
+        return dict(js=["js/filamentsensorsimplifiedorangepi.js"], css=["css/filamentsensorsimplifiedorangepi.css"])
 
     # Template hooks
     def get_template_configs(self):
@@ -79,7 +79,7 @@ class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
     def get_settings_defaults(self):
         return dict(
             gpio_mode=10,
-            pin=0,  # Default is 0
+            pin='PC9',  # Default is 0
             power=0,
             g_code=self.default_gcode,
             triggered=0,
@@ -173,13 +173,13 @@ class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
         if self.plugin_enabled(pin):
             self._logger.info("Enabling filament sensor.")
             self._logger.info("Mode is %s" % gpio_mode)
-            # BOARD
+            # SUNXI
             if gpio_mode is 10:
                 # if mode set by 3rd party don't set it again
                 if not self.gpio_mode_disabled:
                     self._logger.info("Setting Board mode")
                     GPIO.cleanup()
-                    GPIO.setmode(GPIO.BOARD)
+                    GPIO.setmode(GPIO.SUNXI)
                 # first check pins not in use already
                 usage = GPIO.gpio_function(pin)
                 self._logger.debug("usage on pin %s is %s" % (pin, usage))
@@ -278,7 +278,7 @@ class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
             # check if pin is not power/ground pin or out of range but allow the disabled value (0)
             if pin_to_save is not 0:
                 try:
-                    # BOARD
+                    # SUNXI
                     if gpio_mode_to_save is 10:
                         # before saving check if pin not used by others
                         usage = GPIO.gpio_function(pin_to_save)
@@ -443,18 +443,18 @@ class Filament_sensor_simplifiedPlugin(octoprint.plugin.StartupPlugin,
         # Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
         # for details.
         return dict(
-            filamentsensorsimplified=dict(
+            filamentsensorsimplifiedorangepi=dict(
                 displayName="Filament sensor simplified",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
                 type="github_release",
-                user="luckyx182",
-                repo="Filament_sensor_simplified",
+                user="oshanrube",
+                repo="Filament_sensor_simplified-OrangePi",
                 current=self._plugin_version,
 
                 # update method: pip
-                pip="https://github.com/luckyx182/Filament_sensor_simplified/archive/{target_version}.zip"
+                pip="https://github.com/oshanrube/Filament_sensor_simplified-OrangePi/archive/{target_version}.zip"
             )
         )
 
@@ -482,7 +482,7 @@ def __plugin_check__():
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = Filament_sensor_simplifiedPlugin()
+    __plugin_implementation__ = Filament_sensor_simplifiedOrangePiPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
