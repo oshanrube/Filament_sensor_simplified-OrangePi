@@ -161,18 +161,18 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         if self.plugin_enabled(pin):
             self._logger.info("Enabling filament sensor.")
             # SUNXI
-			# if mode set by 3rd party don't set it again
-			if not self.gpio_mode_disabled:
-				self._logger.info("Setting Board mode")
-				GPIO.cleanup()
-				GPIO.setmode(GPIO.SUNXI)
-			# first check pins not in use already
-			usage = GPIO.gpio_function(pin)
-			self._logger.debug("usage on pin %s is %s" % (pin, usage))
-			# 1 = input
-			if usage is not 1:
-				# 555 is not http specific so I chose it
-				return "", 555
+            # if mode set by 3rd party don't set it again
+            if not self.gpio_mode_disabled:
+                self._logger.info("Setting Board mode")
+                GPIO.cleanup()
+                GPIO.setmode(GPIO.SUNXI)
+            # first check pins not in use already
+            usage = GPIO.gpio_function(pin)
+            self._logger.debug("usage on pin %s is %s" % (pin, usage))
+            # 1 = input
+            if usage is not 1:
+                # 555 is not http specific so I chose it
+                return "", 555
             if not test:
                 try:
                     # 0 = sensor is grounded, react to rising edge pulled up by pull up resistor
@@ -251,16 +251,16 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
             if pin_to_save is not 0:
                 try:
                     # SUNXI
-					# before saving check if pin not used by others
-					usage = GPIO.gpio_function(pin_to_save)
-					self._logger.debug("usage on pin %s is %s" % (pin_to_save, usage))
-					if usage is not 1:
-						self._logger.info(
-							"You are trying to save pin %s which is already used by others" % (pin_to_save))
-						self._plugin_manager.send_plugin_message(self._identifier,
-																 dict(type="error", autoClose=True,
-																	  msg="Filament sensor settings not saved, you are trying to use a pin which is already used by others"))
-						return
+                    # before saving check if pin not used by others
+                    usage = GPIO.gpio_function(pin_to_save)
+                    self._logger.debug("usage on pin %s is %s" % (pin_to_save, usage))
+                    if usage is not 1:
+                        self._logger.info(
+                            "You are trying to save pin %s which is already used by others" % (pin_to_save))
+                        self._plugin_manager.send_plugin_message(self._identifier,
+                                                                 dict(type="error", autoClose=True,
+                                                                      msg="Filament sensor settings not saved, you are trying to use a pin which is already used by others"))
+                        return
 
                 except ValueError:
                     self._logger.info(
