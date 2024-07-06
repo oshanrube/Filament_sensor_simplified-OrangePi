@@ -8,20 +8,6 @@
     <h4>{{ _('Sensor setup') }}</h4>
 
     <div class="control-group">
-        <label class="control-label" for="filamentsensorsimplifiedorangepi_settings_gpioMode">{{ _('Board mode') }}</label>
-        <div class="controls">
-            <select title="{{ _('Board - referring to the pins by the number, BCM - referring to the pins by the Broadcom SOC channel') }}" id="filamentsensorsimplifiedorangepi_settings_gpioMode" data-bind="value: settingsViewModel.settings.plugins.filamentsensorsimplifiedorangepi.gpio_mode, disable:gpio_mode_disabled() || printing()" required>
-                <option value=10>{{ _('Physical/Board mode') }}</option>
-                <option value=11>{{ _('GPIO/BCM mode') }}</option>
-            </select>
-            <div class="alert alert-info" data-bind="visible: gpio_mode_disabled">
-                <i class="fas fa-info icon-info-sign iconRight"></i>
-                {{ _('Board mode has been set by third party/other plugin and is disabled') }}
-            </div>
-        </div>
-    </div>
-
-    <div class="control-group">
         <label class="control-label" for="filamentsensorsimplifiedorangepi_settings_pinInput">{{ _('Pin number') }}</label>
         <div class="controls">
             <input id="filamentsensorsimplifiedorangepi_settings_pinInput" type="text" class="input-mini" data-bind="value: settingsViewModel.settings.plugins.filamentsensorsimplifiedorangepi.pin, disable:printing" required>
