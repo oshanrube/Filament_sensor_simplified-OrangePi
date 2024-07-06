@@ -166,13 +166,6 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
                 self._logger.info("Setting Board mode")
                 GPIO.cleanup()
                 GPIO.setmode(GPIO.SUNXI)
-            # first check pins not in use already
-            usage = GPIO.gpio_function(pin)
-            self._logger.debug("usage on pin %s is %s" % (pin, usage))
-            # 1 = input
-            if usage is not 1:
-                # 555 is not http specific so I chose it
-                return "", 555
             if not test:
                 try:
                     # 0 = sensor is grounded, react to rising edge pulled up by pull up resistor
