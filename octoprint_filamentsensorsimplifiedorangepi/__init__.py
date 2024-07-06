@@ -103,7 +103,7 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
 
             self.init_gpio(selected_pin, selected_power, triggered_mode, True)
             triggered_int = self.is_filament_present(selected_pin, selected_power, triggered_mode)
-            self.init_gpio(self.setting_gpio_mode, self.setting_pin, self.setting_power, self.setting_triggered, True)
+            self.init_gpio(self.setting_pin, self.setting_power, self.setting_triggered, True)
             return flask.jsonify(triggered=triggered_int)
         except ValueError as e:
             self._logger.error(str(e))
