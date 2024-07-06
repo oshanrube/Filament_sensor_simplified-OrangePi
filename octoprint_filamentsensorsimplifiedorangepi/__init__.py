@@ -323,7 +323,7 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
     # read sensor input value
     def read_sensor(self, pin, power, trigger_mode):
         self._logger.debug("reading pin %s " % pin)
-        self.pull_resistor(pin, power)
+        # self.pull_resistor(pin, power)
         pin_value = GPIO.input(pin)
         return (pin_value + power + trigger_mode) % 2 is 0
 
