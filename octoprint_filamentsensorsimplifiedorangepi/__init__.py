@@ -231,17 +231,17 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         power_to_save = self._settings.get_int(["power"])
         self._logger.info("Reading power_to_save: %s" % power_to_save)
         trigger_mode_to_save = self._settings.get_int(["triggered"])
-
         self._logger.info("Reading trigger_mode_to_save: %s" % trigger_mode_to_save)
 
         if "pin" in data:
             pin_to_save = str(data.get("pin"))
-
+            self._logger.info("Reading pin_to_save: %s" % pin_to_save)
         if "power" in data:
             power_to_save = int(data.get("power"))
-
+            self._logger.info("Reading power_to_save: %s" % power_to_save)
         if "trigger" in data:
             trigger_mode_to_save = int(data.get("triggered"))
+            self._logger.info("Reading trigger_mode_to_save: %s" % trigger_mode_to_save)
 
         if pin_to_save is not None:
             # check if pin is not power/ground pin or out of range but allow the disabled value (0)
