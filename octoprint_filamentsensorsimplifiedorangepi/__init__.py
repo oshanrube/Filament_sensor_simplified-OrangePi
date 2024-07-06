@@ -49,7 +49,7 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
 
     @property
     def setting_pin(self):
-        return int(self._settings.get(["pin"]))
+        return str(self._settings.get(["pin"]))
 
     @property
     def setting_power(self):
@@ -100,7 +100,7 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
     def on_api_command(self, command, data):
         try:
             selected_power = int(data.get("power"))
-            selected_pin = int(data.get("pin"))
+            selected_pin = str(data.get("pin"))
             mode = int(data.get("mode"))
             triggered_mode = int(data.get("triggered"))
 
@@ -164,11 +164,6 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
             self._settings.set(["gpio_mode"], preset_gpio_mode)
         else:
             self._logger.info("Preset mode is %s" % preset_gpio_mode)
-
-        # Fix old -1 settings to 0
-        if pin is -1:
-            self._logger.debug("Fixing old settings from -1 to 0")
-            self._settings.set(["pin"], 0)
 
         if self.plugin_enabled(pin):
             self._logger.info("Enabling filament sensor.")
@@ -257,13 +252,13 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
     def on_settings_save(self, data):
         # Retrieve any settings not changed in order to validate that the combination of new and old settings end up in a bad combination
         self._logger.info("Saving settings for Filament Sensor Simplified")
-        pin_to_save = self._settings.get_int(["pin"])
+        pin_to_save = self._settings.get_str(["pin"])
         gpio_mode_to_save = self._settings.get_int(["gpio_mode"])
         power_to_save = self._settings.get_int(["power"])
         trigger_mode_to_save = self._settings.get_int(["triggered"])
 
         if "pin" in data:
-            pin_to_save = int(data.get("pin"))
+            pin_to_save = str(data.get("pin"))
 
         if "gpio_mode" in data:
             gpio_mode_to_save = int(data.get("gpio_mode"))
