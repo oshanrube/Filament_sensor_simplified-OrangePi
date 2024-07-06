@@ -230,6 +230,10 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         power_to_save = self._settings.get_int(["power"])
         trigger_mode_to_save = self._settings.get_int(["triggered"])
 
+        self._logger.info("Reading pin_to_save: %s" % pin_to_save)
+        self._logger.info("Reading power_to_save: %s" % power_to_save)
+        self._logger.info("Reading trigger_mode_to_save: %s" % trigger_mode_to_save)
+
         if "pin" in data:
             pin_to_save = str(data.get("pin"))
 
