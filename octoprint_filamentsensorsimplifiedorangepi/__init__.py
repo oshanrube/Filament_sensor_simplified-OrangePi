@@ -5,7 +5,7 @@ import octoprint.plugin
 import re
 from octoprint.events import Events
 from time import sleep
-import RPi.GPIO as GPIO
+import OPi.GPIO as GPIO
 import flask
 
 
@@ -472,9 +472,7 @@ __plugin_version__ = "0.3.3"
 
 def __plugin_check__():
     try:
-        import RPi.GPIO as GPIO
-        if GPIO.VERSION < "0.6":  # Need at least 0.6 for edge detection
-            return False
+        import OPi.GPIO as GPIO
     except ImportError:
         return False
     return True
