@@ -242,25 +242,6 @@ class Filament_sensor_simplifiedOrangePiPlugin(octoprint.plugin.StartupPlugin,
         if pin_to_save is not None:
             # check if pin is not power/ground pin or out of range but allow the disabled value (0)
             if pin_to_save is not 0:
-                try:
-                    # SUNXI
-                    # before saving check if pin not used by others
-                    usage = GPIO.gpio_function(pin_to_save)
-                    self._logger.debug("usage on pin %s is %s" % (pin_to_save, usage))
-                    if usage is not 1:
-                        self._logger.info(
-                            "You are trying to save pin %s which is already used by others" % (pin_to_save))
-                        self._plugin_manager.send_plugin_message(self._identifier,
-                                                                 dict(type="error", autoClose=True,
-                                                                      msg="Filament sensor settings not saved, you are trying to use a pin which is already used by others"))
-                        return
-
-                except ValueError:
-                    self._logger.info(
-                        "You are trying to save pin %s which is ground/power pin or out of range" % (pin_to_save))
-                    self._plugin_manager.send_plugin_message(self._identifier, dict(type="error", autoClose=True,
-                                                                                    msg="Filament sensor settings not saved, you are trying to use a pin which is ground/power pin or out of range"))
-                    return
                 self.init_gpio(pin_to_save, power_to_save, trigger_mode_to_save, False)
                 self.init_icon(pin_to_save, power_to_save, trigger_mode_to_save)
         octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
